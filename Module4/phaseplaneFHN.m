@@ -66,6 +66,9 @@ legend('Initial Condition: v(0) = -1.5, w(0) = -0.5', ...
        'Initial Condition: v(0) = 0.0, w(0) = -0.5', ...
        'Location', 'Best');
 grid on;
+
+
+
 %% include I(t) current and stimulate at t=40~47
 %a=1.0
 a_2 = 1.0;

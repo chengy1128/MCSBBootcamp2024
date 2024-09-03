@@ -17,7 +17,7 @@ IK0 = 0;
 initial_conditions = [A0, I0, AP0, IK0];
 
 % Time span for simulation
-tspan = [0 50]; % Adjust as needed
+tspan = [0 0.5]; % Adjust as needed
 
 % Solve the ODE system using ode45
 [t, X] = ode45(@(t, X) futile_cycle_odes(t, X, params), tspan, initial_conditions);

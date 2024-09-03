@@ -1,22 +1,22 @@
 % Define the range of Ktot values for the parameter sweep
-Ktot_values = logspace(-3, 2, 100); % From 10^-3 to 10^2 µM
+Ktot_values = logspace(-3, 2, 50); % From 10^-3 to 10^2 µM
 A_steady_state = zeros(size(Ktot_values));
 
 % Parameters that remain constant
-params.kAon = 10; % s^-1µM^-1
-params.kAoff = 10; % s^-1
-params.kIon = 10; % s^-1µM^-1
-params.kIoff = 10; % s^-1
-params.kIcat = 10; % s^-1
-params.kAcat = 100; % s^-1
-params.Ptot = 1.0; % µM, total phosphatase concentration
+params.kAon = 10; 
+params.kAoff = 10; 
+params.kIon = 10; 
+params.kIoff = 10; 
+params.kIcat = 10; 
+params.kAcat = 100; 
+params.Ptot = 1.0;
 
 % Initial conditions (all protein is initially inactive)
 Itot = 1.0; % µM, total inactive protein concentration
 initial_conditions = [0, Itot, 0, 0]; % [A0, I0, AP0, IK0]
 
 % Time span for simulation
-tspan = [0 100]; % Adjust as needed
+tspan = [0 1000]; % Adjust as needed
 
 % Loop over each Ktot value
 for i = 1:length(Ktot_values)

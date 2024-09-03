@@ -1,7 +1,5 @@
 
 
-
-
 % Define the ODE system
 function dXdt = fhn_ring_with_injection(t, X)
 % Define parameters
@@ -21,7 +19,8 @@ I = @(t) I0 * (t > tStart) .* (t < tStop);  % Current injection function
 tspan = [0 100];  % Adjust as needed
 
 % Initial conditions for v and w (10 cells, so 20 initial conditions)
-initial_conditions = [-0.9293*ones(1,10), -0.1466*ones(1,10)];  % Steady state values
+% Initial conditions for v and w 
+initial_conditions = [-1.1297 *ones(1,10), -0.6491*ones(1,10)];  % Steady state values
     v = X(1:10);   % Extract v_i for all cells
     w = X(11:20);  % Extract w_i for all cells
     
@@ -59,6 +58,8 @@ initial_conditions = [-0.9293*ones(1,10), -0.1466*ones(1,10)];  % Steady state v
 end
 
 % Solve the ODE system using ode45
+% Define the time span for the simulation
+tspan = [0 1000];  % Adjust as needed
 [T, X] = ode45(@fhn_ring_with_injection, tspan, initial_conditions);
 
 % Plot the time series of membrane potential v_i(t) for all 10 cells

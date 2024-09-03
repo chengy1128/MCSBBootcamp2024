@@ -48,17 +48,17 @@ xlabel('Time (t)');
 ylabel('Membrane Potential (v_i)');
 legend('Cell 1', 'Cell 2', 'Cell 3', 'Cell 4', 'Cell 5', 'Cell 6', 'Cell 7', 'Cell 8', 'Cell 9', 'Cell 10');
 grid on;
-% movie
-figure;
-for nt = 1:numel(T)
-    clf; hold on; box on;
-    plot(X(nt,1:10), 'LineWidth', 2);
-    set(gca, 'ylim', [-2.5, 2.5]);
-    xlabel('Cell Number');
-    ylabel('Voltage');
-    title(['Time = ', num2str(T(nt))]);
-    drawnow;
-end
+% % movie
+% figure;
+% for nt = 1:numel(T)
+%     clf; hold on; box on;
+%     plot(X(nt,1:10), 'LineWidth', 2);
+%     set(gca, 'ylim', [-2.5, 2.5]);
+%     xlabel('Cell Number');
+%     ylabel('Voltage');
+%     title(['Time = ', num2str(T(nt))]);
+%     drawnow;
+% end
 
 %% 
 %% include I(t) current and stimulate at t=40~47
