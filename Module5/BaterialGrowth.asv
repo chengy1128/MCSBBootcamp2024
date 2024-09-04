@@ -1,0 +1,26 @@
+% % Define Parameters
+% lambda = 1;
+% theta = 10^3;
+% alpha = 2;
+% initial = 200; % Initial N(0) = 200
+
+% Define the ODE function
+function dNdt = BacterialGrowth(t, N)
+    lambda = 1; 
+    theta = 10^3;
+    alpha = 2;
+    dNdt = lambda * N * (1 - N / theta)^alpha;
+end
+
+% Define the time span
+tspan = [0, 100];
+
+% Solve the ODE using ode45
+[T, N] = ode45(@(t, N) BacterialGrowth(t, N), tspan, initial);
+
+% Plot the results
+plot(T, N);
+xlabel('Time');
+ylabel('N(t)');
+title('Bacterial Growth Over Time');
+
