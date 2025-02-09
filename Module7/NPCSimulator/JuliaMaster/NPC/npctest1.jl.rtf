@@ -1,0 +1,135 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;\red245\green245\blue245;\red0\green0\blue0;
+\red15\green112\blue1;\red157\green0\blue210;\red19\green118\blue70;\red144\green1\blue18;\red109\green109\blue109;
+\red14\green110\blue109;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c100000;\cssrgb\c96863\c96863\c96863;\cssrgb\c0\c0\c0;
+\cssrgb\c0\c50196\c0;\cssrgb\c68627\c0\c85882;\cssrgb\c3529\c52549\c34510;\cssrgb\c63922\c8235\c8235;\cssrgb\c50196\c50196\c50196;
+\cssrgb\c0\c50196\c50196;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 using\cf0 \strokec4  Statistics\cb1 \
+\cf2 \cb3 \strokec2 using\cf0 \strokec4  Distributions\cb1 \
+\cf2 \cb3 \strokec2 using\cf0 \strokec4  StaticArrays\cb1 \
+\cf2 \cb3 \strokec2 using\cf0 \strokec4  Base\cf2 \strokec2 .\cf0 \strokec4 Threads\cb1 \
+\cf2 \cb3 \strokec2 using\cf0 \strokec4  LinearAlgebra  \cf5 \strokec5 # This includes BLAS\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Function to set number of threads\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 function\cf0 \strokec4  \cf6 \strokec6 set_threads\cf0 \strokec4 (n)\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     \cf2 \strokec2 if\cf0 \strokec4  n > \cf7 \strokec7 0\cf0 \cb1 \strokec4 \
+\cb3         BLAS\cf2 \strokec2 .\cf6 \strokec6 set_num_threads\cf0 \strokec4 (n)\cb1 \
+\cb3         \cf6 \strokec6 println\cf0 \strokec4 (\cf8 \strokec8 "Set BLAS threads to \cf0 \strokec4 $n\cf8 \strokec8 "\cf0 \strokec4 )\cb1 \
+\cb3         \cf2 \strokec2 if\cf0 \strokec4  Threads\cf2 \strokec2 .\cf6 \strokec6 nthreads\cf0 \strokec4 () != n\cb1 \
+\cb3             \cf9 \strokec9 @warn\cf0 \strokec4  \cf8 \strokec8 "Julia threads (\cf0 \strokec4 $(Threads\cf2 \strokec2 .\cf6 \strokec6 nthreads\cf0 \strokec4 ()\cf8 \strokec8 )) don't match requested threads (\cf0 \strokec4 $n\cf8 \strokec8 ). This is normal in environments like Google Colab."\cf0 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 end\cf0 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 end\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 end\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Simulation parameters struct\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 struct \cf10 \strokec10 SimParams\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     dt\cf2 \strokec2 ::\cf10 \strokec10 Float64\cf0 \cb1 \strokec4 \
+\cb3     ntmax\cf2 \strokec2 ::\cf10 \strokec10 Int\cf0 \cb1 \strokec4 \
+\cb3     NSample\cf2 \strokec2 ::\cf10 \strokec10 Int\cf0 \cb1 \strokec4 \
+\cb3     D\cf2 \strokec2 ::\cf10 \strokec10 Float64\cf0 \cb1 \strokec4 \
+\cb3     L\cf2 \strokec2 ::\cf10 \strokec10 Float64\cf0 \cb1 \strokec4 \
+\cb3     NPCSize\cf2 \strokec2 ::\cf10 \strokec10 Float64\cf0 \cb1 \strokec4 \
+\cb3     NPCLocation\cf2 \strokec2 ::\cf10 \strokec10 SVector\{\cf7 \strokec7 2\cf0 \strokec4 , \cf10 \strokec10 Float64\}\cf0 \cb1 \strokec4 \
+\cb3     alpha\cf2 \strokec2 ::\cf10 \strokec10 Float64\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 end\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Create parameters\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 function\cf0 \strokec4  \cf6 \strokec6 create_params\cf0 \strokec4 (dt, ntmax, NSample)\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     D = \cf7 \strokec7 10.0\cf0 \strokec4   \cf5 \strokec5 # microns^2/second\cf0 \cb1 \strokec4 \
+\cb3     L = \cf7 \strokec7 10.0\cf0 \strokec4   \cf5 \strokec5 # microns\cf0 \cb1 \strokec4 \
+\cb3     NPCSize = \cf7 \strokec7 0.1\cf0 \strokec4   \cf5 \strokec5 # microns\cf0 \cb1 \strokec4 \
+\cb3     NPCLocation = \cf10 \strokec10 SVector\{\cf7 \strokec7 2\cf0 \strokec4 , \cf10 \strokec10 Float64\}\cf0 \strokec4 (-L/\cf7 \strokec7 2\cf0 \strokec4 , \cf7 \strokec7 0\cf0 \strokec4 )\cb1 \
+\cb3     alpha = \cf6 \strokec6 sqrt\cf0 \strokec4 (\cf7 \strokec7 2\cf0 \strokec4 *D*dt)\cb1 \
+\cb3     \cb1 \
+\cb3     \cf6 \strokec6 SimParams\cf0 \strokec4 (dt, ntmax, NSample, D, L, NPCSize, NPCLocation, alpha)\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 end\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Simulate!\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 function\cf0 \strokec4  \cf6 \strokec6 run_simulation\cf0 \strokec4 (params\cf2 \strokec2 ::\cf10 \strokec10 SimParams\cf0 \strokec4 )\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     tCapture = \cf6 \strokec6 zeros\cf0 \strokec4 (\cf10 \strokec10 Float64\cf0 \strokec4 , params\cf2 \strokec2 .\cf0 \strokec4 NSample)\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 # Precompute random numbers\cf0 \cb1 \strokec4 \
+\cb3     random_numbers = \cf6 \strokec6 randn\cf0 \strokec4 (\cf10 \strokec10 Float64\cf0 \strokec4 , (\cf7 \strokec7 2\cf0 \strokec4 , params\cf2 \strokec2 .\cf0 \strokec4 ntmax, params\cf2 \strokec2 .\cf0 \strokec4 NSample))\cb1 \
+\cb3     \cb1 \
+\cb3     \cf9 \strokec9 @threads\cf0 \strokec4  \cf2 \strokec2 for\cf0 \strokec4  iSample \cf2 \strokec2 in\cf0 \strokec4  \cf7 \strokec7 1\cf2 \strokec2 :\cf0 \strokec4 params\cf2 \strokec2 .\cf0 \strokec4 NSample\cb1 \
+\cb3         \cf5 \strokec5 # initial condition\cf0 \cb1 \strokec4 \
+\cb3         x = \cf10 \strokec10 SVector\{\cf7 \strokec7 2\cf0 \strokec4 , \cf10 \strokec10 Float64\}\cf0 \strokec4 (params\cf2 \strokec2 .\cf0 \strokec4 L/\cf7 \strokec7 2\cf0 \strokec4 , \cf7 \strokec7 0\cf0 \strokec4 )\cb1 \
+\
+\cb3         t = \cf7 \strokec7 0.0\cf0 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 for\cf0 \strokec4  nt \cf2 \strokec2 in\cf0 \strokec4  \cf7 \strokec7 1\cf2 \strokec2 :\cf0 \strokec4 params\cf2 \strokec2 .\cf0 \strokec4 ntmax\cb1 \
+\cb3             \cf5 \strokec5 # dynamics\cf0 \cb1 \strokec4 \
+\cb3             x = x .+ params\cf2 \strokec2 .\cf0 \strokec4 alpha .* \cf10 \strokec10 SVector\{\cf7 \strokec7 2\cf0 \strokec4 , \cf10 \strokec10 Float64\}\cf0 \strokec4 (random_numbers[:, nt, iSample])\cb1 \
+\
+\cb3             \cf5 \strokec5 # boundaries\cf0 \cb1 \strokec4 \
+\cb3             x = \cf10 \strokec10 SVector\{\cf7 \strokec7 2\cf0 \strokec4 , \cf10 \strokec10 Float64\}\cf0 \strokec4 (\cf6 \strokec6 clamp\cf0 \strokec4 (x[\cf7 \strokec7 1\cf0 \strokec4 ], -params\cf2 \strokec2 .\cf0 \strokec4 L/\cf7 \strokec7 2\cf0 \strokec4 , params\cf2 \strokec2 .\cf0 \strokec4 L/\cf7 \strokec7 2\cf0 \strokec4 ), \cf6 \strokec6 clamp\cf0 \strokec4 (x[\cf7 \strokec7 2\cf0 \strokec4 ], -params\cf2 \strokec2 .\cf0 \strokec4 L/\cf7 \strokec7 2\cf0 \strokec4 , params\cf2 \strokec2 .\cf0 \strokec4 L/\cf7 \strokec7 2\cf0 \strokec4 ))\cb1 \
+\
+\cb3             \cf5 \strokec5 # test for NPC capture\cf0 \cb1 \strokec4 \
+\cb3             \cf2 \strokec2 if\cf0 \strokec4  \cf6 \strokec6 sum\cf0 \strokec4 ((x .- params\cf2 \strokec2 .\cf0 \strokec4 NPCLocation).^\cf7 \strokec7 2\cf0 \strokec4 ) < params\cf2 \strokec2 .\cf0 \strokec4 NPCSize^\cf7 \strokec7 2\cf0 \cb1 \strokec4 \
+\cb3                 tCapture[iSample] = t\cb1 \
+\cb3                 \cf2 \strokec2 break\cf0 \cb1 \strokec4 \
+\cb3             \cf2 \strokec2 end\cf0 \cb1 \strokec4 \
+\
+\cb3             t += params\cf2 \strokec2 .\cf0 \strokec4 dt\cb1 \
+\cb3         \cf2 \strokec2 end\cf0 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 end\cf0 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 return\cf0 \strokec4  tCapture\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 end\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Set desired number of threads (adjust as needed)\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 set_threads\cf0 \strokec4 (\cf6 \strokec6 min\cf0 \strokec4 (\cf7 \strokec7 4\cf0 \strokec4 , Threads\cf2 \strokec2 .\cf6 \strokec6 nthreads\cf0 \strokec4 ()))\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Define simulation parameters\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 dt = \cf7 \strokec7 0.001\cf0 \strokec4   \cf5 \strokec5 # s\cf0 \cb1 \strokec4 \
+\cb3 ntmax = \cf10 \strokec10 Int\cf0 \strokec4 (\cf7 \strokec7 1e6\cf0 \strokec4 )\cb1 \
+\cb3 NSample = \cf7 \strokec7 2000\cf0 \strokec4   \cf5 \strokec5 # number of samples\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Create parameters\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 params = \cf6 \strokec6 create_params\cf0 \strokec4 (dt, ntmax, NSample)\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Run and time the simulation\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 println\cf0 \strokec4 (\cf8 \strokec8 "Running with \cf0 \strokec4 $(Threads\cf2 \strokec2 .\cf6 \strokec6 nthreads\cf0 \strokec4 ()\cf8 \strokec8 ) threads"\cf0 \strokec4 )\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 start = \cf6 \strokec6 time\cf0 \strokec4 ()\cb1 \
+\cb3 tCapture = \cf6 \strokec6 run_simulation\cf0 \strokec4 (params)\cb1 \
+\cb3 elapsed = \cf6 \strokec6 time\cf0 \strokec4 () - start\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 println\cf0 \strokec4 (\cf8 \strokec8 "Elapsed time: "\cf0 \strokec4 , elapsed)\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 # Basic analysis\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 println\cf0 \strokec4 (\cf8 \strokec8 "Mean capture time: "\cf0 \strokec4 , \cf6 \strokec6 mean\cf0 \strokec4 (tCapture))\cb1 \
+\cf6 \cb3 \strokec6 println\cf0 \strokec4 (\cf8 \strokec8 "Median capture time: "\cf0 \strokec4 , \cf6 \strokec6 median\cf0 \strokec4 (tCapture))\cb1 \
+\cf6 \cb3 \strokec6 println\cf0 \strokec4 (\cf8 \strokec8 "Standard deviation of capture time: "\cf0 \strokec4 , \cf6 \strokec6 std\cf0 \strokec4 (tCapture))\cb1 \
+}
